@@ -18,9 +18,11 @@ void tans_value(bool* des, bool* sour) {
 		des[i] = sour[i];
 	}
 }
-
+/*
+*	计算size
+*/
 long calSize(bool S[Num]) {
-	unsigned int min = tables[0].size();//table的大小
+	unsigned int min = MAXINT;//table的大小
 	int row = 0;//第几个table
 	for (int i = 0;i < Num; i++) {
 		if (S[i] && min > tables[i].size()) {
@@ -31,6 +33,7 @@ long calSize(bool S[Num]) {
 	
 	map<int,long> n;
 	Table::iterator it;
+	map<int, int> mini;
 
 	for (int i = 0;i < Num; i++) {//O(Num)
 		if (S[i] && i != row) {
@@ -38,7 +41,9 @@ long calSize(bool S[Num]) {
 				int key = it->first;
 				if (tables[i].count(key)!=0) {
 					if (n[key] == 0) n[key] = 1;
-					n[key] *= tables[i][key];
+					int temp = tables[i][key];
+					n[key] *= temp;
+					if (mini[key] == 0 || mini[key] > temp) mini[key] = temp;
 				}
 			}
 		}
@@ -52,49 +57,55 @@ long calSize(bool S[Num]) {
 	cout << res << endl;
 	for (map<int, long>::iterator it = n.begin(); it != n.end();it++) {
 		res = res / it->second;
-		cout << it->first << ' ' << it->second << ' ' << res << endl;
+		cout <<"/"<< it->first << ' ' << it->second << ' ' << res << endl;
+	}
+	for (map<int, int>::iterator it = mini.begin();it != mini.end();it++) {
+		res = res * it->second;
+		cout <<"*"<< it->first << ' ' << it->second << ' ' << res << endl;
 	}
 	return res;
 }
-
-int* calOrder() {
-	int order[Num];
-	int* ori_order = order;
-
-	bool s[Num];
-	for (int i = 0;i < Num; i++) {
-		s[i] = true;
-	}
-
-	if (count == 2) {
-		long res = 1;
-		for (int i = 0;i < Num; i++) {
-			if (S[i]) {
-				res *= NumOfTuple[i];
-			}
+/*
+*	getcal_key
+*/
+cal_key getcal_key(bool s[Num]) {
+	int num = 0;
+	int sum = 0;
+	for (int i = 0; i < Num;i++) {
+		if (s[i]) {
+			num++;
+			sum += i;
 		}
-		return res;
 	}
-	else {
-		for (int i = 0; i < Num;i++) {
-			if (S[i]) {
-				bool s_new[Num];
-				tans_value(s_new, S);
-				s_new[i] = false;
-				if (max < calSize(s_new, order)) {
-					max = calSize(s_new, order);
-					*order = i;
-				}
-			}
-		}
-		order++;
-		cout << *order << " ";
-		return max;
-	}
-
-	return ori_order;
+	return cal_key(num, sum);
 }
+/* 贪心
+*/
+void calOrder(bool S[Num],int* order, int pos) {
+	if (pos == 0) return;
 
+	Table::iterator it;
+	long max = 0;
+	int o = 0;
+	bool s_new[Num];
+
+	for (int i = 0;i < Num;i++) {
+		if (S[i]) {
+			tans_value(s_new, S);
+			s_new[i] = false;
+			long temp = calSize(s_new);
+			if (max < temp) {
+				max = temp;
+				o = i;
+			}
+		}	
+	}
+	order[pos] = o;
+	calOrder(s_new, order, pos--);
+	return;
+}
+/*
+*/
 int main() {
 	///////////////////////////
 	//get datas and info
@@ -111,10 +122,12 @@ int main() {
 	//////////////////
 	//start cal order
 	//////////////////
-	bool s[Num] = {false};
-	s[0] = true;
-	s[1] = true;
-	cout<<calSize(s)<<endl;
+	bool s[Num] = {true};
+	int order[Num];
+	calOrder(s, order, Num - 1);
+	for (int i = 0; i < Num;i++) {
+		cout << order[i] << " ";
+	}
 	//////////////////
 	//free
 	//////////////////

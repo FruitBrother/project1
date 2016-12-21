@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#define MAXINT 0x7ffff
 using namespace std;
 
 string Q[] = { "a", "b", "c", "d", "e", "f", "g" };
@@ -39,6 +40,30 @@ int* Rq[Num] = {Rq1,Rq2,Rq3,Rq4};
 
 typedef map<int, int> Table;
 Table* tables = new Table[Num];
+
+struct cal_key//散列函数
+{
+	int num;//key数量
+	int sum;//key和
+	cal_key(int a, int b) {
+		num = a;
+		sum = b;
+	}
+	bool operator<(const cal_key & ct) const    
+	{
+		if (num < ct.num) {
+			return true;
+		}
+		else if (num == ct.num) {
+			if (sum < ct.sum) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+};
+
 
 /*
 double Size(Table* ori, int Num, Table* ne, int sizeofOri, int sizeofNe) {
