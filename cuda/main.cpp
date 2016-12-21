@@ -7,7 +7,7 @@ using namespace std;
 
 void printTable(Table* table) {
 	Table::iterator it;
-	cout << (*table).size() << ' :'<<endl;
+	cout << (*table).size() << ':'<<endl;
 	for (it = (*table).begin(); it != (*table).end(); it++) {
 		cout << it->first << " " << it->second << endl;
 	}
@@ -36,12 +36,12 @@ long calSize(bool S[Num]) {
 	map<int, int> mini;
 
 	for (int i = 0;i < Num; i++) {//O(Num)
-		if (S[i] && i != row) {
+		if (S[i] && i != row ) {
 			for (it = tables[row].begin(); it != tables[row].end(); it++) {//O(min)
 				int key = it->first;
 				if (tables[i].count(key)!=0) {
-					if (n[key] == 0) n[key] = 1;
 					int temp = tables[i][key];
+					if (n[key] == 0) n[key] = 1;
 					n[key] *= temp;
 					if (mini[key] == 0 || mini[key] > temp) mini[key] = temp;
 				}
@@ -50,19 +50,23 @@ long calSize(bool S[Num]) {
 	}
 
 	long res = 1;
-	
+	for (map<int, long>::iterator it = n.begin(); it != n.end(); it++) {
+		int v = tables[row][it->first];
+		if (v > mini[it->first]) {
+			it->second /= mini[it->first];
+			it->second *= v;
+		}
+	}
+
 	for (int i = 0;i < Num; i++) {
 		if (S[i]) res *= NumOfTuple[i];
 	}
-	cout << res << endl;
+	//cout << res << endl;
 	for (map<int, long>::iterator it = n.begin(); it != n.end();it++) {
 		res = res / it->second;
-		cout <<"/"<< it->first << ' ' << it->second << ' ' << res << endl;
+		//cout <<"/"<< it->first << ' ' << it->second << ' ' << res << endl;
 	}
-	for (map<int, int>::iterator it = mini.begin();it != mini.end();it++) {
-		res = res * it->second;
-		cout <<"*"<< it->first << ' ' << it->second << ' ' << res << endl;
-	}
+	if (res == 0) return 1;
 	return res;
 }
 /*
@@ -82,26 +86,28 @@ cal_key getcal_key(bool s[Num]) {
 /* Ì°ÐÄ
 */
 void calOrder(bool S[Num],int* order, int pos) {
-	if (pos == 0) return;
+	if (pos == -1) return;
 
 	Table::iterator it;
-	long max = 0;
+	long min = MAXINT;
 	int o = 0;
 	bool s_new[Num];
 
 	for (int i = 0;i < Num;i++) {
+		bool temp_new[Num];
 		if (S[i]) {
-			tans_value(s_new, S);
-			s_new[i] = false;
-			long temp = calSize(s_new);
-			if (max < temp) {
-				max = temp;
+			tans_value(temp_new, S);
+			temp_new[i] = false;
+			long temp = calSize(temp_new);
+			if (min > temp) {
+				min = temp;
 				o = i;
+				tans_value(s_new, temp_new);
 			}
 		}	
 	}
 	order[pos] = o;
-	calOrder(s_new, order, pos--);
+	calOrder(s_new, order, --pos);
 	return;
 }
 /*
@@ -116,18 +122,23 @@ int main() {
 		for (int j = 0; j < NumOfTuple[i] * SizeOfTuple[i]; j++) {
 			(*t)[r[j]]++;
 		}
-		//cout << endl;
-		//printTable(&t);
+		//printTable(t);
 	}
 	//////////////////
 	//start cal order
 	//////////////////
-	bool s[Num] = {true};
+	bool s[Num];
+	for (int i = 0; i < Num; i++) {
+		s[i] = true;
+	}
+
 	int order[Num];
 	calOrder(s, order, Num - 1);
 	for (int i = 0; i < Num;i++) {
 		cout << order[i] << " ";
 	}
+	cout << endl;
+	
 	//////////////////
 	//free
 	//////////////////
