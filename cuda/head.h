@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdio.h>
 #include <iostream>
 #include <string>
@@ -5,7 +7,7 @@
 #define MAXINT 0x7ffff
 using namespace std;
 
-string Q[] = { "a", "b", "c", "d", "e", "f", "g" };
+string Query[] = { "a", "b", "c", "d", "e", "f", "g" };
 string Q1[] = { "a", "b", "c" };
 string Q2[] = { "b", "g", "d", "e", "f" };
 string Q3[] = { "d", "c", "a" };
@@ -37,7 +39,7 @@ const int Num = 4;//关系数量
 int NumOfTuple[Num] = { 3,4,5,6 };//元组大小
 int SizeOfTuple[Num] = {3,5,3,3};//元组个数
 int* Rq[Num] = {Rq1,Rq2,Rq3,Rq4};
-
+string* Q[Num] = { Q1,Q2,Q3,Q4 };
 typedef map<int, int> Table;
 Table* tables = new Table[Num];
 
@@ -63,53 +65,3 @@ struct cal_key//散列函数
 		return false;
 	}
 };
-
-
-/*
-double Size(Table* ori, int Num, Table* ne, int sizeofOri, int sizeofNe) {
-	Table::iterator it;
-	Table::iterator it1;
-	Element::iterator it2;
-	map<int, int> ha;
-	long m1 = sizeofOri * sizeofNe;
-	long m2 = 1;
-	for (it = (*ne).begin(); it != (*ne).end(); it++) {//key
-		string key = it->first;
-		int max = 0;
-		for (int i = 0; i<Num; i++) {//tables
-			Table* t = ori + i;
-			if ((*t)[key].size() != 0) {//key exist
-				Element *EA, *EB;
-				if ((*t)[key].size() < (*ne)[key].size()) {//smaller size is EA
-					EA = &(*t)[key];
-					EB = &(*ne)[key];
-				}
-				else {
-					EB = &(*ne)[key];
-					EA = &(*t)[key];
-				}
-				for (it2 = (*EA).begin(); it2 != (*EA).end(); it2++) {//id = it2->first
-					if ((*EB).count(it2->first) != 0) {
-						int a = it2->second;
-						int b = (*EB)[it2->first];
-						a = (a > b) ? a : b;
-						int k = it2->first;
-						if (ha.count(k) != 0)
-							ha[k] = a;
-						else
-							if (a > ha[k])
-								ha[k] = a;
-					}
-				}//id
-			}//key exist
-		}//tables
-	}//key
-	delete[] ori;
-	for (map<int, int>::iterator i = ha.begin(); i != ha.end(); i++) {
-		cout << i->first << " " << i->second << endl;
-		m2 *= i->second;
-	}
-	return m1*1.0 / m2;
-}
-
-*/

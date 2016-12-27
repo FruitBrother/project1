@@ -1,94 +1,106 @@
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <string.h>
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include <time.h>
+#define MAX(a,b) (a<b)?b:a
+struct dint {
+	int a, b;
+};
 
-#include <stdio.h>
+extern "C" void gpu(int *rqa, int *rqb, int* res, dint* equal, int stepa, int stepb, int resstep) {
+	//allocate memory in gpu and tans the data to it
+	int *dev_rqa = 0;
+	int *dev_rqb = 0;
+	int *dev_res = 0;
+	int *dev_equal = 0;
+	cudaSetDevice(0);
+	cudaMalloc((void**)&dev_rqa, numa*stepa * sizeof(int));
+	cudaMalloc((void**)&dev_rqb, numb*stepb * sizeof(int));
+	cudaMalloc((void**)&dev_equal, sizeof(dint)*MAX(numa, numb));
 
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size);
+	cudaMemcpy(dev_rqa, rqa, numa*stepa * sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_rqb, rqb, numb*stepb * sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_res, res, numa*numb*resstep * sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_equal, equal, sizeof(dint)*MAX(numa, numb), cudaMemcpyHostToDevice);
 
-__global__ void addKernel(int *c, const int *a, const int *b)
-{
-    int i = threadIdx.x;
-    c[i] = a[i] + b[i];
+	dim3 block(16, 16);
+	dim3 grid((numa + 15) / 16, (numb + 15) / 16);
+	join <<<grid, block >>> (dev_rqa, dev_rqb, dev_res, dev_equal, stepa, stepb, resstep, equalsize, numa, numb);
+	cudaDeviceSynchronize();
+	cudaMemcpy(res, dev_res, numa*numb*resstep * sizeof(int), cudaMemcpyDeviceToHost);
+
+	cudaFree(dev_rqa);
+	cudaFree(dev_rqb);
+	cudaFree(dev_res);
+	cudaFree(dev_equal);
+}
+
+
+__global__ void join(int *rqa, int *rqb, int* res, dint* equal, int stepa, int stepb, int resstep, int equalsize, int numa, int numb)
+{	int ea, eb;
+	bool isMatch = true;
+	int k, index, equalid, id;
+	int x = blockIdx.x * blockDim.x + threadIdx.x;
+	int y = blockIdx.y * blockIdx.y + threadIdx.y;
+	if (x >= numa || y >= numb) return;
+
+	for (k = 0; k < equalsize; k++) {
+		ea = equal[k].a + x*stepa;
+		eb = equal[k].b + y*stepb;
+		if (rqa[ea] != rqb[eb]) {
+			isMatch = false;
+			break;
+		}
+	}
+	if (isMatch) {
+		equalid = 0;
+		index = 0;
+		id = y*resstep + x;
+		for (k = 0; k < stepa + stepb; k++) {
+			if (k < stepa) {
+				res[id + k] = rqa[x*stepa + k];
+				index = k;
+			}
+			else if (equal[equalid].b != k - stepa) {
+				res[id + (++index)] = rqb[y*stepb + (k - stepa)];
+			}
+			else {
+				equalid++;
+			}
+		}
+	}
 }
 
 
 // Helper function for using CUDA to add vectors in parallel.
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size)
+void addWithCuda(int *c, const int *a, const int *b, unsigned int size)
 {
     int *dev_a = 0;
     int *dev_b = 0;
     int *dev_c = 0;
-    cudaError_t cudaStatus;
 
-    // Choose which GPU to run on, change this on a multi-GPU system.
-    cudaStatus = cudaSetDevice(0);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
-        goto Error;
-    }
+	cudaSetDevice(0);
 
-    // Allocate GPU buffers for three vectors (two input, one output)    .
-    cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
+	cudaMalloc((void**)&dev_c, size * sizeof(int));
+	cudaMalloc((void**)&dev_a, size * sizeof(int));
+    cudaMalloc((void**)&dev_b, size * sizeof(int));
 
-    cudaStatus = cudaMalloc((void**)&dev_a, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
+    cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(dev_b, b, size * sizeof(int), cudaMemcpyHostToDevice);
 
-    cudaStatus = cudaMalloc((void**)&dev_b, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
-
-    // Copy input vectors from host memory to GPU buffers.
-    cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
-
-    cudaStatus = cudaMemcpy(dev_b, b, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
-
-    // Launch a kernel on the GPU with one thread for each element.
     addKernel<<<1, size>>>(dev_c, dev_a, dev_b);
 
-    // Check for any errors launching the kernel
-    cudaStatus = cudaGetLastError();
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
-        goto Error;
-    }
-    
-    // cudaDeviceSynchronize waits for the kernel to finish, and returns
-    // any errors encountered during the launch.
-    cudaStatus = cudaDeviceSynchronize();
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching addKernel!\n", cudaStatus);
-        goto Error;
-    }
+    cudaGetLastError();
+    cudaDeviceSynchronize();
+    cudaMemcpy(c, dev_c, size * sizeof(int), cudaMemcpyDeviceToHost);
 
-    // Copy output vector from GPU buffer to host memory.
-    cudaStatus = cudaMemcpy(c, dev_c, size * sizeof(int), cudaMemcpyDeviceToHost);
-    if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
 
 Error:
     cudaFree(dev_c);
     cudaFree(dev_a);
     cudaFree(dev_b);
     
-    return cudaStatus;
 }
