@@ -1,19 +1,16 @@
-#pragma once
 #include <iostream>
+#include <stdlib.h>
+#include <stdio.h>
+#include "cpu.h"
 #include "head.h"
-#define MAX(a,b) (a<b)?b:a
-struct dint {
-	int a, b;
-};
-
+#include "data_extern.h"
+#include <algorithm>
 using namespace std;
-int main1() {
+int cpu(int a, int b) {
 	/*init*/
 	string *qa, *qb;
-	int a, b, stepa, stepb, numa, numb;
+	int stepa, stepb, numa, numb;
 	int* rqa, *rqb;
-	a = 0;
-	b = 1;
 	qa = Q[a];
 	qb = Q[b];
 	rqa = Rq[a];
@@ -23,8 +20,8 @@ int main1() {
 	numa = NumOfTuple[a];
 	numb = NumOfTuple[b];
 	/*pre process*/
-	dint* equal;
-	equal = (dint*)malloc(sizeof(dint)*MAX(numa, numb));
+	dint* equal = 0;
+	equal = (dint*)malloc(sizeof(dint)*MAX(stepa, stepb));
 	int equalsize = 0;
 	for (int i = 0; i < stepa; i++) {
 		for (int j = 0; j < stepb; j++) {
@@ -35,12 +32,26 @@ int main1() {
 			}
 		}
 	}
+	sort(equal, equal + equalsize, comp);
 	/*init result*/
 	int* res;
 	int stepres;
 	int numres = 0;
 	stepres = stepa + stepb - equalsize;
-	string *resQ = (string*)malloc(sizeof(string)*(stepres));
+	string *resQ = new string[stepres];
+	int temp = 0, temp1 = 0;
+	for (int k = 0; k < stepa + stepb; k++) {
+		if (k < stepa) {
+			resQ[k] = qa[k];
+			temp = k;
+		}
+		else if (equal[temp1].b != k - stepa) {
+			resQ[(++temp)] = qb[(k - stepa)];
+		}
+		else {
+			temp1++;
+		}
+	}
 	res = (int*)malloc(sizeof(int)*stepres*(numa*numb));
 	/*process*/
 	for (int i = 0; i < numa; i++) {//cuda
@@ -79,11 +90,23 @@ int main1() {
 				
 		}
 	}
-	
+	//free
+	//free(Rq[a]);
+	//free(Q[a]);
+	free(equal);
+	Rq[a] = res;
+	Q[a] = resQ;
+	NumOfTuple[a] = numres;
+	SizeOfTuple[a] = stepres;
+	if (numres == 0) return NORESULT;
 	//print
-	for (int i = 0; i < numres; i++) {
-		for (int j = 0; j < stepres; j++) {
-			cout << res[i*stepres + j] << ' ';
+	for (int j = 0; j < SizeOfTuple[a]; j++) {
+		cout << Q[a][j] << ' ';
+	}
+	cout << endl;
+	for (int i = 0; i < NumOfTuple[a]; i++) {
+		for (int j = 0; j < SizeOfTuple[a]; j++) {
+			cout << Rq[a][i*stepres + j] << ' ';
 		}
 		cout << endl;
 	}
