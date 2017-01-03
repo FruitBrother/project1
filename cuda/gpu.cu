@@ -10,7 +10,7 @@ __global__ void join(int *rqa, int *rqb, int* res, dint* equal, int stepa, int s
 	bool isMatch = true;
 	int k, index, equalid, id;
 	int x = blockIdx.x * blockDim.x + threadIdx.x;
-	int y = blockIdx.y * blockIdx.y + threadIdx.y;
+	int y = blockIdx.y * blockDim.y + threadIdx.y;
 	if (x >= numa || y >= numb) return;
 	for (k = 0; k < equalsize; k++) {
 		ea = equal[k].a + x*stepa;
@@ -58,8 +58,8 @@ extern "C" void gpu(int *rqa, int *rqb, int* res, dint* equal, int stepa, int st
 	cudaMemcpy(dev_rqb, rqb, numb*stepb * sizeof(int), cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_equal, equal, sizeof(dint)*MAX(numa, numb), cudaMemcpyHostToDevice);
 
-	dim3 block(16, 16);
-	dim3 grid((numa + 15) / 16, (numb + 15) / 16);
+	dim3 block(BLOCKX, BLOCKY);
+	dim3 grid((numa + BLOCKX - 1) / BLOCKX, (numb + BLOCKY - 1) / BLOCKY);
 	join <<<grid,block>>> (dev_rqa, dev_rqb, dev_res, dev_equal, stepa, stepb, resstep, equalsize, numa, numb);
 	cudaDeviceSynchronize();
 	

@@ -56,11 +56,28 @@ int gpu(int a, int b) {
 	/*process*/
 	gpu(rqa,rqb,res,equal,stepa,stepb,stepres,numa,numb,equalsize);
 	numres = numa*numb;
+	//process the result
+	int* tem = (int*)malloc(sizeof(int)*numres);
+	int temnum = 0;
+	for (int i = 0; i < numres; i++) {
+		if (res[i*stepres] != 0) {
+			tem[temnum++] = i;
+		}
+	}
+	numres = temnum;
+	int *new_res = (int*)malloc(sizeof(int)*stepres*(temnum));
+	for (int i = 0; i < numres; i++) {
+		for (int j = 0; j < stepres; j++) {
+			new_res[i*stepres + j] = res[tem[i]*stepres + j];
+		}
+	}
 	//free
 	//free(Rq[a]);
 	//free(Q[a]);
+	free(res);
+	free(tem);
 	free(equal);
-	Rq[a] = res;
+	Rq[a] = new_res;
 	Q[a] = resQ;
 	NumOfTuple[a] = numres;
 	SizeOfTuple[a] = stepres;
@@ -71,12 +88,18 @@ int gpu(int a, int b) {
 	}
 	cout << endl;
 	for (int i = 0; i < NumOfTuple[a]; i++) {
-		if (Rq[a][i*stepres] != 0) {
+		//if (Rq[a][i*stepres] != 0) {
 			for (int j = 0; j < SizeOfTuple[a]; j++) {
 				cout << Rq[a][i*stepres + j] << ' ';
 			}
 			cout << endl;
-		}
+		//}
 	}
+	return 0;
+}
+
+extern "C" void gpuwithscan(int *rqa, int *rqb, int* res, dint* equal, int stepa, int stepb, int resstep, int numa, int numb, int equalsize);
+int gpuwithscan(int a, int b)
+{
 	return 0;
 }

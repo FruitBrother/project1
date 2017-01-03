@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{644FB86D-EE25-44FF-860A-8A6315AF67F0}</ProjectGuid>
-    <RootNamespace>cuda</RootNamespace>
+    <ProjectGuid>{086DCFE6-44B9-4220-90AC-0BC04259275F}</ProjectGuid>
+    <RootNamespace>hello</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -151,25 +151,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="gpuwithscan.cu" />
-    <CudaCompile Include="gpu.cu" />
-    <CudaCompile Include="scan.cu" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="cpu.h" />
-    <ClInclude Include="data.h" />
-    <ClInclude Include="data_extern.h" />
-    <ClInclude Include="gpu.h" />
-    <ClInclude Include="head.h" />
-    <ClInclude Include="order.h" />
-    <ClInclude Include="scan.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="gpu.cpp" />
-    <ClCompile Include="head.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="order.cpp" />
-    <ClCompile Include="cpu.cpp" />
+    <CudaCompile Include="kernel.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
