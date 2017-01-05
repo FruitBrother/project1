@@ -4,6 +4,7 @@
 #define WITHOUTORDER 0
 #define MAXINT 0x7ffff
 #define NORESULT 1
+#define HASRESULT 0
 #define BLOCKX 8
 #define BLOCKY 8
 #define BLOCK_SIZE BLOCKX*BLOCKY

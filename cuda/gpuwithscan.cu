@@ -44,12 +44,12 @@ __global__ void result_output(int *rqa, int *rqb, int* res, unsigned int* flag, 
 		id = ID*resstep;
 		for (k = 0; k < stepa + stepb; k++) {
 			if (k < stepa) {
-				res[flag_compute[id] + k] = rqa[x*stepa + k];
+				res[flag_compute[ID]*resstep + k] = rqa[x*stepa + k];
 
 				index = k;
 			}
 			else if (equal[equalid].b != k - stepa) {
-				res[flag_compute[id] + (++index)] = rqb[y*stepb + (k - stepa)];
+				res[flag_compute[ID]*resstep + (++index)] = rqb[y*stepb + (k - stepa)];
 			}
 			else {
 				equalid++;
@@ -117,25 +117,26 @@ extern "C" void gpuwithscan(int *rqa, int *rqb, int* res, dint* equal, int stepa
 	//prejoin
 	prejoin<<<grid, block>>>(dev_rqa, dev_rqb, dev_flag, dev_equal, stepa, stepb, equalsize, numa, numb);
 	CUDAKERNELCHECK;
-	CUDACHECK(cudaDeviceSynchronize());
+	//CUDACHECK(cudaDeviceSynchronize());
 	
 	//get_result_info
 	CUDACHECK(cudaMalloc((void**)&dev_flag_compute, numa*numb * sizeof(unsigned int)));
-	get_result_info(dev_flag, dev_flag_compute, numa*numb);
-	
+	get_result_info(dev_flag_compute, dev_flag, numa*numb);
+	//CUDACHECK(cudaDeviceSynchronize());
+
 	//allcate the result-- **may be more optimization needed here**
 	flag_compute = (unsigned int*)malloc(sizeof(unsigned int)* numa*numb);
 	CUDACHECK(cudaMemcpy(flag_compute, dev_flag_compute, numa*numb * sizeof(unsigned int), cudaMemcpyDeviceToHost));
 	*numresgpu = flag_compute[numa*numb-1];
 	free(flag_compute);
-	CUDACHECK(cudaMalloc((void**)&dev_res, numa*numb*resstep * sizeof(int)));
+	CUDACHECK(cudaMalloc((void**)&dev_res, (*numresgpu)*resstep * sizeof(int)));
 	
 	//output the result	
 	result_output<<<grid, block>>>(dev_rqa, dev_rqb, dev_res, dev_flag, dev_flag_compute, dev_equal, stepa, stepb, resstep, numa, numb);
 	CUDAKERNELCHECK;
-	CUDACHECK(cudaDeviceSynchronize());
+	//CUDACHECK(cudaDeviceSynchronize());
 
-	CUDACHECK(cudaMemcpy(res, dev_res, numa*numb*resstep * sizeof(int), cudaMemcpyDeviceToHost));
+	CUDACHECK(cudaMemcpy(res, dev_res, (*numresgpu)*resstep * sizeof(int), cudaMemcpyDeviceToHost));
 
 	cudaFree(dev_flag);
 	cudaFree(dev_flag_compute);

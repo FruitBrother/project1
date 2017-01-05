@@ -96,7 +96,7 @@ int gpu(int a, int b) {
 			cout << endl;
 		//}
 	}
-	return 0;
+	return HASRESULT;
 }
 
 extern "C" void gpuwithscan(int *rqa, int *rqb, int* res, dint* equal, int stepa, int stepb, int resstep, int numa, int numb, int equalsize, int* numresgpu);
@@ -173,5 +173,5 @@ int gpuwithscan(int a, int b)
 		cout << endl;
 		//}
 	}
-	return 0;
+	return HASRESULT;
 }

@@ -6,12 +6,20 @@
 #include "head.h"
 typedef map<int, int> Table;
 void filter(Table* tables) {
-	Table t1;
-	int* t2;
+	int size = 0;
+	Table t;
 	for (int i = 0; i < Num; i++) {
-		t1 = tables[i];
-		for (Table::iterator it = t1.begin(); it != t1.end(); it++) {
-			
+		for (Table::iterator it = tables[i].begin(); it != tables[i].end(); it++) {
+			if (t[it->first] == 1) {
+				size++;
+			}
+			t[it->first]++;
+		}
+	}
+	int *hash = (int*)malloc(sizeof(int)*size);
+	for (Table::iterator it = t.begin(); it != t.end(); it++) {
+		if (it->second > 1) {
+			//hash[func()] = it->first;
 		}
 	}
 }

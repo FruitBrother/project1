@@ -12,7 +12,7 @@
 
 using namespace std;
 int run() {
-	string s;
+	string s = "gpuWithScan";
 	cin >> s;
 	int* ord = order();
 	int a, b;
@@ -20,25 +20,31 @@ int run() {
 	if (!s.compare("gpu")) {
 		for (int i = 1; i < Num; i++) {
 			b = ord[i];
-			if (gpu(a, b) == NORESULT)
+			if (gpu(a, b) == NORESULT) {
 				printf("No result!\n");
+				goto End;
+			}
 		}
 	}
 	if (!s.compare("gpuWithScan")) {
 		for (int i = 1; i < Num; i++) {
 			b = ord[i];
-			if (gpuwithscan(a, b) == NORESULT)
+			if (gpuwithscan(a, b) == NORESULT) {
 				printf("No result!\n");
+				goto End;
+			}
 		}
 	}
 	if (!s.compare("cpu")) {
 		for (int i = 1; i < Num; i++) {
 			b = ord[i];
-			if (cpu(a, b) == NORESULT)
+			if (cpu(a, b) == NORESULT) {
 				printf("No result!\n");
+				goto End;
+			}
 		}
 	}
-		
+End:		
 	return 0;
 }
 void Test() {

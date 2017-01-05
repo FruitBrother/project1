@@ -1,2 +1,3 @@
 #pragma once
-void filter(Table* tables)
+typedef map<int, int> Table;
+void filter(Table* tables);

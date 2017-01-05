@@ -1,2 +1,2 @@
 #pragma once
-int* order();
+int* order(bool isorder = WITHOUTORDER);
