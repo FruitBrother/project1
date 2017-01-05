@@ -1,3 +1,4 @@
+#pragma warning(disable:4819)
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -48,22 +49,24 @@ extern "C" void gpu(int *rqa, int *rqb, int* res, dint* equal, int stepa, int st
 	int *dev_res = 0;
 	dint *dev_equal = 0;
 	cudaSetDevice(0);
+	cudaError_t cudaStatus;
 
-	cudaMalloc((void**)&dev_rqa, numa*stepa * sizeof(int));
-	cudaMalloc((void**)&dev_rqb, numb*stepb * sizeof(int));
-	cudaMalloc((void**)&dev_res, numa*numb*resstep * sizeof(int));
-	cudaMalloc((void**)&dev_equal, sizeof(dint)*MAX(numa, numb));
+	CUDACHECK(cudaMalloc((void**)&dev_rqa, numa*stepa * sizeof(int)));
+	CUDACHECK(cudaMalloc((void**)&dev_rqb, numb*stepb * sizeof(int)));
+	CUDACHECK(cudaMalloc((void**)&dev_res, numa*numb*resstep * sizeof(int)));
+	CUDACHECK(cudaMalloc((void**)&dev_equal, sizeof(dint)*MAX(numa, numb)));
 
-	cudaMemcpy(dev_rqa, rqa, numa*stepa * sizeof(int), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_rqb, rqb, numb*stepb * sizeof(int), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_equal, equal, sizeof(dint)*MAX(numa, numb), cudaMemcpyHostToDevice);
+	CUDACHECK(cudaMemcpy(dev_rqa, rqa, numa*stepa * sizeof(int), cudaMemcpyHostToDevice));
+	CUDACHECK(cudaMemcpy(dev_rqb, rqb, numb*stepb * sizeof(int), cudaMemcpyHostToDevice));
+	CUDACHECK(cudaMemcpy(dev_equal, equal, sizeof(dint)*MAX(numa, numb), cudaMemcpyHostToDevice));
 
 	dim3 block(BLOCKX, BLOCKY);
 	dim3 grid((numa + BLOCKX - 1) / BLOCKX, (numb + BLOCKY - 1) / BLOCKY);
 	join <<<grid,block>>> (dev_rqa, dev_rqb, dev_res, dev_equal, stepa, stepb, resstep, equalsize, numa, numb);
-	cudaDeviceSynchronize();
+	CUDAKERNELCHECK;
+	CUDACHECK(cudaDeviceSynchronize());
 	
-	cudaMemcpy(res, dev_res, numa*numb*resstep * sizeof(int), cudaMemcpyDeviceToHost);
+	CUDACHECK(cudaMemcpy(res, dev_res, numa*numb*resstep * sizeof(int), cudaMemcpyDeviceToHost));
 
 	cudaFree(dev_rqa);
 	cudaFree(dev_rqb);

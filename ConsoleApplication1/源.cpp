@@ -1,6 +1,9 @@
 #include <iostream>
 using namespace std;
-int main() {
+void df(int* a) {
+	*a = 99;
+}
+int main1() {
 	int num;
 	while (cin >> num) {
 		int *a = new int[num];
@@ -14,4 +17,10 @@ int main() {
 			cout << a[i] << endl;
 		}
 	}
+	return 0;
 } 
+int main() {
+	int k = 0;
+	df(&k);
+	cout << k << endl;
+}

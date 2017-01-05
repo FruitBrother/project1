@@ -1,11 +1,11 @@
 #pragma once
-#include "order.h"
 #include <stdio.h>
 #include <iostream>
 #include <string>
 #include <map>
 #include "data_extern.h"
 #include "head.h"
+#include "filter.h"
 using namespace std;
 typedef map<int, int> Table;
 Table* tables = new Table[Num];
@@ -103,7 +103,7 @@ void calOrder(bool S[Num], int* order, int pos) {
 }
 /*
 */
-int* order() {
+int* order(bool isorder = WITHOUTORDER) {
 	///////////////////////////
 	//get datas and info
 	//////////////////////////
@@ -128,6 +128,7 @@ int* order() {
 	//////////////////////////
 	//free
 	/////////////////////////
+	if (isorder) filter(tables);
 	delete[] tables;
 	return order;
 	/*

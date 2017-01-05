@@ -1,3 +1,4 @@
+#pragma warning(disable:4819)
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

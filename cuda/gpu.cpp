@@ -99,7 +99,7 @@ int gpu(int a, int b) {
 	return 0;
 }
 
-extern "C" void gpuwithscan(int *rqa, int *rqb, int* res, dint* equal, int stepa, int stepb, int resstep, int numa, int numb, int equalsize, int numresgpu);
+extern "C" void gpuwithscan(int *rqa, int *rqb, int* res, dint* equal, int stepa, int stepb, int resstep, int numa, int numb, int equalsize, int* numresgpu);
 int gpuwithscan(int a, int b)
 {
 	/*init*/
@@ -149,9 +149,8 @@ int gpuwithscan(int a, int b)
 	}
 	res = (int*)malloc(sizeof(int)*stepres*(numa*numb));
 	/*process*/
-	int numresgpu = 0;
-	gpuwithscan(rqa, rqb, res, equal, stepa, stepb, stepres, numa, numb, equalsize, numresgpu);
-	numres = numresgpu;
+	gpuwithscan(rqa, rqb, res, equal, stepa, stepb, stepres, numa, numb, equalsize, &numres);	//numres = numresgpu;
+
 	//free
 	//free(Rq[a]);
 	//free(Q[a]);

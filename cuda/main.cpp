@@ -24,7 +24,7 @@ int run() {
 				printf("No result!\n");
 		}
 	}
-	if (!s.compare("gpu with scan")) {
+	if (!s.compare("gpuWithScan")) {
 		for (int i = 1; i < Num; i++) {
 			b = ord[i];
 			if (gpuwithscan(a, b) == NORESULT)
