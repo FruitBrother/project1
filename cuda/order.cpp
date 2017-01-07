@@ -102,7 +102,7 @@ void calOrder(bool S[Num], int* order, int pos) {
 }
 /*
 */
-int* order(bool isorder = WITHOUTORDER) {
+int* order() {
 	///////////////////////////
 	//get datas and info
 	//////////////////////////
@@ -127,7 +127,6 @@ int* order(bool isorder = WITHOUTORDER) {
 	//////////////////////////
 	//free
 	/////////////////////////
-	if (isorder) filter(tables);
 	delete[] tables;
 	return order;
 	/*

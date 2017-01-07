@@ -166,6 +166,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="filter.cu" />
     <CudaCompile Include="gpuwithscan.cu" />
     <CudaCompile Include="gpu.cu" />
     <CudaCompile Include="scan.cu" />

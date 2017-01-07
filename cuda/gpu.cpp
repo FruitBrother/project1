@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
-#include "cpu.h"
 #include "head.h"
 #include "data_extern.h"
 #include <algorithm>
@@ -53,7 +52,7 @@ int gpu(int a, int b) {
 		}
 	}
 	res = (int*)malloc(sizeof(int)*stepres*(numa*numb));
-	/*process*/
+		/*process*/
 	gpu(rqa,rqb,res,equal,stepa,stepb,stepres,numa,numb,equalsize);
 	numres = numa*numb;
 	//process the result 

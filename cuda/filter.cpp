@@ -4,22 +4,43 @@
 #include <map>
 #include "data_extern.h"
 #include "head.h"
-typedef map<int, int> Table;
-void filter(Table* tables) {
-	int size = 0;
-	Table t;
-	for (int i = 0; i < Num; i++) {
-		for (Table::iterator it = tables[i].begin(); it != tables[i].end(); it++) {
-			if (t[it->first] == 1) {
-				size++;
+#include <algorithm>
+void swap(int* a, int* b) {
+	int c = *a;
+	*a = *b;
+	*b = c;
+}
+extern "C" void filter(int *rqa, int *rqb, dint* equal, int stepa, int stepb, int numa, int numb, int equalsize);
+void filter(int a, int b) {
+	/*init*/
+	int numa = NumOfTuple[a];
+	int numb = NumOfTuple[b];
+	if (numa > numb) {
+		swap(numa, numb);
+		swap(a, b);
+	}//a < b;
+	string *qa, *qb;
+	int stepa, stepb, numa, numb;
+	int* rqa, *rqb;
+	qa = Q[a];
+	qb = Q[b];
+	rqa = Rq[a];
+	rqb = Rq[b];
+	stepa = SizeOfTuple[a];
+	stepb = SizeOfTuple[b];
+	/*pre process*/
+	dint* equal = 0;
+	equal = (dint*)malloc(sizeof(dint)*MAX(stepa, stepb));
+	int equalsize = 0;
+	for (int i = 0; i < stepa; i++) {
+		for (int j = 0; j < stepb; j++) {
+			if (!qa[i].compare(qb[j])) {
+				equal[equalsize].a = i;
+				equal[equalsize].b = j;
+				equalsize++;
 			}
-			t[it->first]++;
 		}
 	}
-	int *hash = (int*)malloc(sizeof(int)*size);
-	for (Table::iterator it = t.begin(); it != t.end(); it++) {
-		if (it->second > 1) {
-			//hash[func()] = it->first;
-		}
-	}
+	//sort(equal, equal + equalsize, comp);
+	filter(rqa, rqb, equal, stepa, stepb, numa, numb, equalsize);
 }

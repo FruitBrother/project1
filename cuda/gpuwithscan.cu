@@ -5,7 +5,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "head.h"
-#include "cudpp.h"
+#include "scan.h"
 __global__ void prejoin(int *rqa, int *rqb, unsigned int* flag, dint* equal, int stepa, int stepb, int equalsize, int numa, int numb)
 {
 	int ea, eb;
@@ -55,37 +55,6 @@ __global__ void result_output(int *rqa, int *rqb, int* res, unsigned int* flag, 
 				equalid++;
 			}
 		}
-	}
-}
-
-
-void get_result_info(unsigned int * d_odata, unsigned int * d_idata, unsigned int numElements)
-{
-	// Initialize the CUDPP Library
-	CUDPPHandle theCudpp;
-	cudppCreate(&theCudpp);
-
-	CUDPPConfiguration config;
-	config.op = CUDPP_ADD;
-	config.datatype = CUDPP_UINT;
-	config.algorithm = CUDPP_SCAN;
-	config.options = CUDPP_OPTION_FORWARD | CUDPP_OPTION_EXCLUSIVE;
-
-	CUDPPHandle scanplan = 0;
-	CUDPPResult res = cudppPlan(theCudpp, &scanplan, config, numElements, 1, 0);
-
-	if (CUDPP_SUCCESS != res)
-	{
-		printf("Error creating CUDPPPlan\n");
-		exit(-1);
-	}
-
-	// Run the scan
-	res = cudppScan(scanplan, d_odata, d_idata, numElements);
-	if (CUDPP_SUCCESS != res)
-	{
-		printf("Error in cudppScan()\n");
-		exit(-1);
 	}
 }
 

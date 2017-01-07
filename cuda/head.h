@@ -5,8 +5,8 @@
 #define MAXINT 0x7ffff
 #define NORESULT 1
 #define HASRESULT 0
-#define BLOCKX 8
-#define BLOCKY 8
+#define BLOCKX 16
+#define BLOCKY 16
 #define BLOCK_SIZE BLOCKX*BLOCKY
 #define CUDACHECK(cudaStatus)\
     if (cudaStatus != cudaSuccess) {\
