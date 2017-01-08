@@ -20,7 +20,7 @@ void filter(int a, int b) {
 		swap(a, b);
 	}//a < b;
 	string *qa, *qb;
-	int stepa, stepb, numa, numb;
+	int stepa, stepb;
 	int* rqa, *rqb;
 	qa = Q[a];
 	qb = Q[b];

@@ -2,7 +2,7 @@
 #pragma warning(disable:4819)
 #define WITHORDER 1
 #define WITHOUTORDER 0
-#define MAXINT 0x7ffff
+#define MAXINT 0x7ffffff
 #define NORESULT 1
 #define HASRESULT 0
 #define BLOCKX 16
@@ -23,6 +23,6 @@
 struct dint {
 	int a, b;
 };
-const int Num = 4;
+const int Num = 3;
 extern unsigned int MAX(int a, int b);
 extern bool comp(dint a, dint b);

@@ -18,7 +18,7 @@ __global__ void createNeta(int *data, int step, int datanum, dint *equal, int eq
 	}
 	sum %= HASHSIZE;
 	if (hash[sum] = 0)
-		atomicAdd(hash[sum], 1);//1
+		atomicAdd( &hash[sum], 1);//1
 }
 __global__ void createNetb(int *data, int step, int datanum, dint *equal, int equalsize, int* hash)
 {
@@ -31,9 +31,10 @@ __global__ void createNetb(int *data, int step, int datanum, dint *equal, int eq
 	}
 	sum %= HASHSIZE;
 	if (hash[sum] != 0){
-		atomicAdd(hash[sum], 1);//>1
+		atomicAdd(&hash[sum], 1);//>1
 	}
 }
+
 __global__ void useNeta(int *data, int step, int datanum, dint *equal, int equalsize, int* hash, int *res) {
 	int x = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = 0;
@@ -43,8 +44,8 @@ __global__ void useNeta(int *data, int step, int datanum, dint *equal, int equal
 		sum += data[x*step + equal[i].a];
 	}
 	sum %= HASHSIZE;
-	if (hash[sum] >1 )
-		res[x*step]
+	if (hash[sum] > 1)
+		res[x*step];
 }
 
 extern "C" void filter(int *rqa, int *rqb, dint* equal, int stepa, int stepb, int numa, int numb, int equalsize)

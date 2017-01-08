@@ -1,7 +1,14 @@
 #pragma once
+#pragma comment( lib,"winmm.lib" )
+#include <Windows.h>
+//#include <Mmsystem.h>
+
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <stdlib.h>
 
 #include "data.h"
 #include "cpu.h"
@@ -11,9 +18,32 @@
 #include "scan.h"
 
 using namespace std;
-int run() {
-	string s = "gpuWithScan";
-	cin >> s;
+void readFile()
+{
+	char buffer[256];
+	ifstream graphFile("C:\\Users\\lining\\Desktop\\data\\Wordnet\\wordnet3out.txt");
+	if (!graphFile.is_open())
+	{
+		cout << "Error opening file"; exit(1);
+	}
+
+	for (int i = 0; i < Num; i++) {
+		graphFile.getline(buffer, sizeof(buffer));
+		cout << buffer << endl;
+		for (int j = 0; j < NumOfTuple[i]; j++) {
+			graphFile.getline(buffer, sizeof(buffer));
+			stringstream word(buffer);
+			int temp;
+			for (int k = 0; k < SizeOfTuple[i]; k++) {
+				word >> temp;
+				Rq[i][j*SizeOfTuple[i] + k] = temp;
+			}
+		}
+	}
+
+	graphFile.close();
+}
+int run(string s = "gpuWithScan") {
 	int* ord = order();
 	int a, b;
 	a = ord[0];
@@ -64,7 +94,17 @@ void Test() {
 	cout << endl;
 }
 int main() {
-	run();
+	readFile();
+	string s;
+	cin >> s;
+
+	DWORD t1, t2;
+	t1 = timeGetTime();
+	run(s);
+	t2 = timeGetTime();
+	printf("Use Time:%f s\n", (t2 - t1)*1.0 / 1000);
+
 	//Test();
+	system("pause");
 	return 0;
 }

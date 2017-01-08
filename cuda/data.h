@@ -1,37 +1,20 @@
 #pragma once
+
 #include "head.h"
 #include <string>
 using namespace std;
-string Query[] = { "a", "b", "c", "d", "e", "f", "g" };
-string Q1[] = { "a", "b", "c" };
-string Q2[] = { "b", "g", "d", "e", "f" };
-string Q3[] = { "d", "c", "a" };
-string Q4[] = { "f","g","e" };
-int Rq1[] = {
-	10010, 10020, 10030,
-	10011, 10021, 10030,
-	10010, 10021, 10032 };
-int Rq2[] = {
-	10021, 10070, 10041, 10050, 10060,
-	10021, 10070, 10042, 10050, 10060,
-	10021, 10070, 10043, 10050, 10060,
-	10022, 10071, 10044, 10050, 10060 };
-int Rq3[] = {
-	10040, 10030, 10011,
-	10041, 10032, 10010,
-	10041, 10030, 10011,
-	10043, 10031, 10010,
-	10042, 10030, 10011 };
-int Rq4[] = {
-	10060, 10070, 10050,
-	10060, 10072, 10050,
-	10061, 10070, 10051,
-	10063, 10071, 10050,
-	10062, 10072, 10050,
-	10060, 10072, 10051 };
+string Query[] = { "4", "1", "2", "3", "5"};
+string Q1[] = { "1", "2", "3" };
+string Q2[] = { "4", "1" };
+string Q3[] = { "3", "2", "5" };
+//string Q4[] = { "f","g","e" };
+int NumOfTuple[Num] = { 229,101459,168 };//元组大小
+int SizeOfTuple[Num] = { 3,2,3 };//元组个数
 
+int *Rq1 = (int*)malloc(sizeof(int)* NumOfTuple[1 - 1] * SizeOfTuple[1 - 1]);
+int *Rq2 = (int*)malloc(sizeof(int)* NumOfTuple[2 - 1] * SizeOfTuple[2 - 1]);
+int *Rq3 = (int*)malloc(sizeof(int)* NumOfTuple[3 - 1] * SizeOfTuple[3 - 1]);
+//int *Rq4 = (int*)malloc(sizeof(int)* NumOfTuple[4 - 1] * SizeOfTuple[4 - 1]);
 
-int NumOfTuple[Num] = { 3,4,5,6 };//元组大小
-int SizeOfTuple[Num] = { 3,5,3,3 };//元组个数
-int* Rq[Num] = { Rq1,Rq2,Rq3,Rq4 };
-string* Q[Num] = { Q1,Q2,Q3,Q4 };
+int* Rq[Num] = { Rq1,Rq2,Rq3 };
+string* Q[Num] = { Q1,Q2,Q3 };

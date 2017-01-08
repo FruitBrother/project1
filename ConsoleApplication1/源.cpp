@@ -20,7 +20,7 @@ int main()
 {
 	char buffer[256];
 
-	ifstream graphFile("C:\\Users\\Lee\\Desktop\\data\\Wordnet\\wordnet3.net");
+	ifstream graphFile("C:\\Users\\lining\\Desktop\\data\\Wordnet\\wordnet3.net");
 	if (!graphFile.is_open())
 	{
 		cout << "Error opening file"; exit(1);
@@ -56,7 +56,7 @@ int main()
 
 	dataGraph.Show(10);
 
-	ifstream labelFile("C:\\Users\\Lee\\Desktop\\data\\Wordnet\\wordnet3.clu");
+	ifstream labelFile("C:\\Users\\lining\\Desktop\\data\\Wordnet\\wordnet3.clu");
 	if (!labelFile.is_open())
 	{
 		cout << "Error opening file"; exit(1);
@@ -87,8 +87,9 @@ int main()
 
 	queryGraph.Show(9);
 
-	ofstream outFile("C:\\Users\\Lee\\Desktop\\data\\Wordnet\\wordnet3out.txt");
+	ofstream outFile("C:\\Users\\lining\\Desktop\\data\\Wordnet\\wordnet3out.txt");
 	for (int j = 0; j < qsize; j++) {
+		int NUM = 0;
 		queryGraph.ShowOne(q[j], outFile);
 		for (int i = 1; i <= NodeSize; i++) {
 		//root
@@ -109,6 +110,7 @@ int main()
 						for (int o = 0; o < lenq; o++)
 							outFile << ' ' << dataGraph.getk(i, temp[o]);
 						outFile << endl;
+						NUM++;
 					}
 					for (int k = temp[now] + 1; k <= lend+1; k++) {//find the match and process the end
 						if (k == lend+1) {//end
@@ -130,7 +132,7 @@ int main()
 				}
 			}
 		}
-		
+		cout << q[j] << ' ' << NUM << endl;
 	}
 	outFile.close();
 

@@ -74,11 +74,11 @@ extern "C" void gpuwithscan(int *rqa, int *rqb, int* res, dint* equal, int stepa
 	CUDACHECK(cudaMalloc((void**)&dev_rqa, numa*stepa * sizeof(int)));
 	CUDACHECK(cudaMalloc((void**)&dev_rqb, numb*stepb * sizeof(int)));
 	CUDACHECK(cudaMalloc((void**)&dev_flag, numa*numb * sizeof(unsigned int)));
-	CUDACHECK(cudaMalloc((void**)&dev_equal, sizeof(dint)*MAX(numa, numb)));
+	CUDACHECK(cudaMalloc((void**)&dev_equal, sizeof(dint)*MAX(stepa, stepb)));
 
 	CUDACHECK(cudaMemcpy(dev_rqa, rqa, numa*stepa * sizeof(int), cudaMemcpyHostToDevice));
 	CUDACHECK(cudaMemcpy(dev_rqb, rqb, numb*stepb * sizeof(int), cudaMemcpyHostToDevice));
-	CUDACHECK(cudaMemcpy(dev_equal, equal, sizeof(dint)*MAX(numa, numb), cudaMemcpyHostToDevice));
+	CUDACHECK(cudaMemcpy(dev_equal, equal, sizeof(dint)*MAX(stepa, stepb), cudaMemcpyHostToDevice));
 
 	dim3 block(BLOCKX, BLOCKY);
 	dim3 grid((numa + BLOCKX - 1) / BLOCKX, (numb + BLOCKY - 1) / BLOCKY);
