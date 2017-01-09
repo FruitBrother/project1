@@ -1,7 +1,6 @@
 #pragma once
 #pragma comment( lib,"winmm.lib" )
 #include <Windows.h>
-//#include <Mmsystem.h>
 
 #include <stdio.h>
 #include <iostream>
@@ -44,9 +43,17 @@ void readFile()
 	graphFile.close();
 }
 int run(string s = "gpuWithScan") {
+
+	DWORD t1, t2;
+	t1 = timeGetTime();
 	int* ord = order();
+	t2 = timeGetTime();
+	printf("order Use Time:%f s\n", (t2 - t1)*1.0 / 1000);
+
 	int a, b;
 	a = ord[0];
+
+	t1 = timeGetTime();
 	if (!s.compare("gpu")) {
 		for (int i = 1; i < Num; i++) {
 			b = ord[i];
@@ -74,8 +81,10 @@ int run(string s = "gpuWithScan") {
 			}
 		}
 	}
+	t2 = timeGetTime();
+	printf("Use Time:%f s\n", (t2 - t1)*1.0 / 1000);
 End:		
-	return 0;
+	return a;
 }
 void Test() {
 	const int numa = 16, numb = 16;
@@ -93,18 +102,26 @@ void Test() {
 	}
 	cout << endl;
 }
+void Print(int a) {
+	//print
+	for (int j = 0; j < SizeOfTuple[a]; j++) {
+		cout << Q[a][j] << ' ';
+	}
+	cout << endl;
+	for (int i = 0; i < NumOfTuple[a]; i++) {
+		for (int j = 0; j < SizeOfTuple[a]; j++) {
+			cout << Rq[a][i*SizeOfTuple[a] + j] << ' ';
+		}
+		cout << endl;
+	}
+}
 int main() {
 	readFile();
 	string s;
 	cin >> s;
-
-	DWORD t1, t2;
-	t1 = timeGetTime();
-	run(s);
-	t2 = timeGetTime();
-	printf("Use Time:%f s\n", (t2 - t1)*1.0 / 1000);
-
+	int A = run(s);
+	//Print(A);
 	//Test();
-	system("pause");
+	//system("pause");
 	return 0;
 }

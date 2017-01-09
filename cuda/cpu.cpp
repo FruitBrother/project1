@@ -1,3 +1,6 @@
+#pragma comment( lib,"winmm.lib" )
+#include <Windows.h>
+
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -54,6 +57,8 @@ int cpu(int a, int b) {
 	}
 	res = (int*)malloc(sizeof(int)*stepres*(numa*numb));
 	/*process*/
+	DWORD t1, t2;
+	t1 = timeGetTime();
 	for (int i = 0; i < numa; i++) {//cuda
 		for (int j = 0; j < numb; j++) {//cuda
 
@@ -90,6 +95,8 @@ int cpu(int a, int b) {
 				
 		}
 	}
+	t2 = timeGetTime();
+	printf("Use Time:%f s\n", (t2 - t1)*1.0 / 1000);
 	//free
 	//free(Rq[a]);
 	//free(Q[a]);
@@ -99,16 +106,5 @@ int cpu(int a, int b) {
 	NumOfTuple[a] = numres;
 	SizeOfTuple[a] = stepres;
 	if (numres == 0) return NORESULT;
-	//print
-	for (int j = 0; j < SizeOfTuple[a]; j++) {
-		cout << Q[a][j] << ' ';
-	}
-	cout << endl;
-	for (int i = 0; i < NumOfTuple[a]; i++) {
-		for (int j = 0; j < SizeOfTuple[a]; j++) {
-			cout << Rq[a][i*stepres + j] << ' ';
-		}
-		cout << endl;
-	}
-	return 0;
+	return HASRESULT;
 }

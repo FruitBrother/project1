@@ -1,3 +1,6 @@
+#pragma comment( lib,"winmm.lib" )
+#include <Windows.h>
+
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -52,10 +55,15 @@ int gpu(int a, int b) {
 		}
 	}
 	res = (int*)malloc(sizeof(int)*stepres*(numa*numb));
-		/*process*/
+	/*process*/
+	DWORD t1, t2;
+	t1 = timeGetTime();
 	gpu(rqa,rqb,res,equal,stepa,stepb,stepres,numa,numb,equalsize);
 	numres = numa*numb;
+	t2 = timeGetTime();
+	printf("process Use Time:%f s\n", (t2 - t1)*1.0 / 1000);
 	//process the result 
+	t1 = timeGetTime();
 	//**IF the memory allocated in GPU defult is 0
 	int* tem = (int*)malloc(sizeof(int)*numres);
 	int temnum = 0;
@@ -71,6 +79,8 @@ int gpu(int a, int b) {
 			new_res[i*stepres + j] = res[tem[i]*stepres + j];
 		}
 	}
+	t2 = timeGetTime();
+	printf("process the result Use Time:%f s\n", (t2 - t1)*1.0 / 1000);
 	//free
 	//free(Rq[a]);
 	//free(Q[a]);
@@ -82,19 +92,6 @@ int gpu(int a, int b) {
 	NumOfTuple[a] = numres;
 	SizeOfTuple[a] = stepres;
 	if (numres == 0) return NORESULT;
-	//print
-	for (int j = 0; j < SizeOfTuple[a]; j++) {
-		cout << Q[a][j] << ' ';
-	}
-	cout << endl;
-	for (int i = 0; i < NumOfTuple[a]; i++) {
-		//if (Rq[a][i*stepres] != 0) {
-			for (int j = 0; j < SizeOfTuple[a]; j++) {
-				cout << Rq[a][i*stepres + j] << ' ';
-			}
-			cout << endl;
-		//}
-	}
 	return HASRESULT;
 }
 
@@ -148,8 +145,11 @@ int gpuwithscan(int a, int b)
 	}
 	res = (int*)malloc(sizeof(int)*stepres*(numa*numb));
 	/*process*/
+	DWORD t1, t2;
+	t1 = timeGetTime();
 	gpuwithscan(rqa, rqb, res, equal, stepa, stepb, stepres, numa, numb, equalsize, &numres);	//numres = numresgpu;
-
+	t2 = timeGetTime();
+	printf("process Use Time:%f s\n", (t2 - t1)*1.0 / 1000);
 	//free
 	//free(Rq[a]);
 	//free(Q[a]);
@@ -159,18 +159,5 @@ int gpuwithscan(int a, int b)
 	NumOfTuple[a] = numres;
 	SizeOfTuple[a] = stepres;
 	if (numres == 0) return NORESULT;
-	//print
-	for (int j = 0; j < SizeOfTuple[a]; j++) {
-		cout << Q[a][j] << ' ';
-	}
-	cout << endl;
-	for (int i = 0; i < NumOfTuple[a]; i++) {
-		//if (Rq[a][i*stepres] != 0) {
-		for (int j = 0; j < SizeOfTuple[a]; j++) {
-			cout << Rq[a][i*stepres + j] << ' ';
-		}
-		cout << endl;
-		//}
-	}
 	return HASRESULT;
 }
